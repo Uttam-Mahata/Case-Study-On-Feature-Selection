@@ -14,6 +14,14 @@ data = pd.read_csv('act_dataset.csv')
 X = data.drop('cid', axis=1)
 y = data['cid']
 
+#Select the continuous feature for normalization
+continuous_features = ['time', 'age', 'wtkg', 'karnof', 'preanti', 'cd40', 'cd420', 'cd820']
+#Normalize the continuous features
+for feature in continuous_features:
+    X[feature] = (X[feature] - X[feature].mean()) / X[feature].std()
+
+
+
 # Step 2: Apply Stepwise Backward Removal feature selection algorithm
 estimator = SVC(kernel="linear")
 selector = RFE(estimator)
@@ -25,10 +33,7 @@ X_reduced.to_csv('act_reduced_dataset_sbr.csv', index=False)
 
 # Step 4: Train various classifiers on both original and reduced datasets
 classifiers = {
-    'SVM': SVC(),
-    'Random Forest': RandomForestClassifier(),
-    'Logistic Regression': LogisticRegression(),
-    'KNN': KNeighborsClassifier()
+    'SVM': SVC()
 }
 
 results = []

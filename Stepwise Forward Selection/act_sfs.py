@@ -10,23 +10,23 @@ from sklearn.neighbors import KNeighborsClassifier
 data = pd.read_csv('act_dataset.csv')
 
 #Select the continuous feature for normalization
-continuous_features = ['time', 'age', 'wtkg', 'karnof', 'preanti', 'cd40', 'cd420', 'cd820']
-#Normalize the continuous features
-for feature in continuous_features:
-    data[feature] = (data[feature] - data[feature].mean()) / data[feature].std()
+# continuous_features = ['time', 'age', 'wtkg', 'karnof', 'preanti', 'cd40', 'cd420', 'cd820']
+# #Normalize the continuous features
+# for feature in continuous_features:
+#     data[feature] = (data[feature] - data[feature].mean()) / data[feature].std()
 
 
 
 # Step 2: Apply Stepwise Forward Selection algorithm
 X = data.drop(columns=['cid'])  # Adjust 'target_column' with your target variable
 y = data['cid']
-sfs = SequentialFeatureSelector(RandomForestClassifier())
+sfs = SequentialFeatureSelector(RandomForestClassifier(), n_features_to_select='auto',scoring='accuracy', direction='forward', n_jobs=-1)
 sfs.fit(X, y)
 selected_features = X.columns[sfs.get_support()]
 
 # Step 3: Save the reduced dataset to a new CSV file
 reduced_data = data[selected_features]
-reduced_data.to_csv('reduced_act_dataset.csv', index=False)
+reduced_data.to_csv('reduced-sfs_act_dataset.csv', index=False)
 
 # Step 4: Split the datasets into training and testing sets
 X_train_orig, X_test_orig, y_train_orig, y_test_orig = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -56,7 +56,8 @@ for fsa, X_train, X_test, y_train, y_test in [('Original', X_train_orig, X_test_
 # print(selected_features)
 # Step 7: Compile the results into a tabular format
 results_df = pd.DataFrame(results, columns=['FSA', 'Classifier', 'Accuracy', 'Precision', 'Recall', 'F1-Score'])
-# print(results_df)
+print(results_df)
+
 
 # Step 8: Visualize the results in graph
 import seaborn as sns
